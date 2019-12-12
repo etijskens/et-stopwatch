@@ -62,7 +62,7 @@ def test_3():
 # that the source directory is on the path
 # ==============================================================================
 if __name__ == "__main__":
-    the_test_you_want_to_debug = test_1
+    the_test_you_want_to_debug = test_3
 
     print("__main__ running", the_test_you_want_to_debug)
     the_test_you_want_to_debug()
