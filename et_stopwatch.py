@@ -6,6 +6,8 @@ A context manager class for timing a piece of code.
 
 from timeit import default_timer as timer
 
+__version__ = "0.1.0"
+
 class Stopwatch:
     """Context manager class for timing a code fragment.
     
