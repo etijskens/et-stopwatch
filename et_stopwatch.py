@@ -12,7 +12,7 @@ class Stopwatch:
     """Context manager class for timing a code fragment.
     
     Usage::
-    
+
        with Stopwatch('This took me') as sw:
            for i in range(3):
                sleep(1)
@@ -24,7 +24,7 @@ class Stopwatch:
         This took me 3.010238 s
 
     :param str comment: text in front of the total time. If None nothing is printed. Default is empty str,
-    :param int ndigits: number of digits after the decimal sign.
+    :param int ndigits: number of printed decimal digits in printed timings.
     """
     def __init__(self,message='',ndigits=6):
         self.started = -1.0
@@ -58,7 +58,7 @@ class Stopwatch:
 
     @property
     def time(self):
-        """Return number of seconds between starting and stopping the stopwatch (for the last time)"""
+        """Return number of seconds between starting and stopping the :py:class:`Stopwatch` (for the last time)"""
         return round(self.stopped-self.started,self.ndigits)
 
 

@@ -32,7 +32,3 @@ Running this code yields:
 * Documentation: https://et-stopwatch.readthedocs.io.
 
 
-Features
---------
-
-* TODO
