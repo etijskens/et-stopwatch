@@ -3,7 +3,7 @@ Module et_stopwatch
 ===================
 A class for timing a piece of code.
 """
-__version__ = "1.0.1"
+__version__ = "1.0.3"
 
 from timeit import default_timer as timer
 from sys import float_info

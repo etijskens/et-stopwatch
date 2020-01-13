@@ -33,6 +33,7 @@ Use as a **context manager**::
         count  : 3
 
 Since stop was called more than once, some statistics are printed.
+
 Use as a **decorator**::
 
     @Stopwatch(name="say_hi_and_sleep_two_seconds", ndigits=3) # custom message, print only 3 digits.
