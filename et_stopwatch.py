@@ -63,6 +63,18 @@ class Stopwatch:
 
         :param bool stats: if False no statistics are acummulated.
         :returns: the number of seconds (float) since the most recent call to stop or start.
+
+        .. note::
+            ``Stop()`` calls ``start()`` immediately before returning. This is practical in
+            an iteration, but as such includes the overhead of the iteration. Call ``start()``
+            explicitly to avoid this as in::
+
+                with Stopwatch(message='This took') as sw:
+                    for i in range(3):
+                        sw.start()               # restart the stopwatch
+                        sleep(1)                 # only this is timed
+                        print(i, sw.stop(), 's') # stop() returns the time since the last call to start|stop in seconds
+
         """
         self.stopped = timer()
         t = round(self.stopped-self.started, self.ndigits)

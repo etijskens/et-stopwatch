@@ -32,29 +32,7 @@ Use as a **context manager**::
         stddev : 0.000727 s
         count  : 3
 
-Since stop was called more than once, some statistics are printed. Calling stop
-automatically restarts the stopwatch and as a consequence the stopwatch also measures the overhead of
-the iteration over i. To avoid this, explicitly call start::
-
-    with Stopwatch(message='This took') as sw:
-        for i in range(3):
-            sw.start()               # restart the stopwatch
-            sleep(1)
-            print(i, sw.stop(), 's') # stop() returns the time since the last call to start|stop in seconds
-
-    0 1.004388
-    1 1.004173
-    2 1.003048
-    This took :
-        total  : 3.011609 s
-        minimum: 1.003048 s
-        maximum: 1.004388 s
-        mean   : 1.00387 s
-        stddev : 0.000588 s
-        count  : 3
-
-This time, the timing are slightly shorter for each iteration.
-
+Since stop was called more than once, some statistics are printed.
 Use as a **decorator**::
 
     @Stopwatch(name="say_hi_and_sleep_two_seconds", ndigits=3) # custom message, print only 3 digits.
