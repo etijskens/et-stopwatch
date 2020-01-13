@@ -2,6 +2,9 @@
 Module et_stopwatch
 ===================
 A class for timing a piece of code.
+
+Inspiration taken from `Python Timer Functions: Three Ways to Monitor Your Code <https://realpython.com/python-timer/#a-python-timer-decorator>`_
+
 """
 __version__ = "1.0.4"
 
@@ -17,9 +20,8 @@ class Stopwatch:
     Constructor parameters:
     
     :param str message: this text will appear when the Stopwatch object is printed
-    :param int ndigits: number of printed decimal digits in printed timings.
+    :param int ndigits: number of digits in returned or printed timings.
 
-    Inspiration taken from `RealPython Python Timer Functions: Three Ways to Monitor Your Code <https://realpython.com/python-timer/#a-python-timer-decorator>`_
     """
     def __init__(self,message='Stopwatch',ndigits=6):
         self.started = -1.0
@@ -72,7 +74,7 @@ class Stopwatch:
                     for i in range(3):
                         sw.start()               # restart the stopwatch
                         sleep(1)                 # only this is timed
-                        print(i, sw.stop(), 's') # stop() returns the time since the last call to start|stop in seconds
+                        print(i, sw.stop(), 's') # stop the stopwatch and returns second since start
 
         """
         self.stopped = timer()
@@ -92,7 +94,8 @@ class Stopwatch:
 
     @property
     def time(self):
-        """The number of seconds as measured in the most recent call to stop()."""
+        """The number of seconds as measured in the most recent call to ``stop()``."""
+
         # Cannot recompute because stop() calls start() to restart the counter.
         # So recomputing it would always yield 0 s.
         return self._time
