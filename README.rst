@@ -2,7 +2,8 @@
 et-stopwatch
 ============
 
-A class for timing code. A :py:class:`Stopwatch` object can be used as::
+A class for timing code. A Stopwatch object can be used to time code using its ``start`` and
+``stop`` methods::
 
     from et_stopwatch import Stopwatch
 
@@ -13,9 +14,9 @@ A class for timing code. A :py:class:`Stopwatch` object can be used as::
 
     stopwatch : 1.003744 s
 
-Use as a context manager, with a custom message::
+Use as a **context manager**::
 
-    with Stopwatch(message='This took') as sw:
+    with Stopwatch(message='This took') as sw: # using a custom message
         for i in range(3):
             sleep(1)
             print(i, sw.stop(), 's') # stop() returns the time since the last call to start|stop in seconds
@@ -31,13 +32,13 @@ Use as a context manager, with a custom message::
         stddev : 0.000727 s
         count  : 3
 
-Since :py:meth:`stop` was called more than once, some statistics are printed. Calling :py:class:`stop`
+Since stop was called more than once, some statistics are printed. Calling stop
 automatically restarts the stopwatch and as a consequence the stopwatch also measures the overhead of
-the iteration over ``i``. To avoid this, explicitly call :py:meth:`start`::
+the iteration over i. To avoid this, explicitly call start::
 
     with Stopwatch(message='This took') as sw:
         for i in range(3):
-            sw.start()
+            sw.start()               # restart the stopwatch
             sleep(1)
             print(i, sw.stop(), 's') # stop() returns the time since the last call to start|stop in seconds
 
@@ -54,9 +55,9 @@ the iteration over ``i``. To avoid this, explicitly call :py:meth:`start`::
 
 This time, the timing are slightly shorter for each iteration.
 
-Use as decorator, with a custom message and custom number of digits printed::
+Use as a **decorator**::
 
-    @Stopwatch(name="say_hi_and_sleep_two_seconds", ndigits=3)
+    @Stopwatch(name="say_hi_and_sleep_two_seconds", ndigits=3) # custom message, print only 3 digits.
     def say_hi_and_sleep_two_seconds():
         print("hi")
         sleep(2)
