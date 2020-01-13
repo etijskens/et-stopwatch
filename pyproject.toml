@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "et-stopwatch"
-version = "0.2.0"
+version = "0.2.1"
 description = "<Enter a one-sentence description of this project here.>"
 authors = ["Engelbert Tijskens <engelbert.tijskens@uantwerpen.be>"]
 license = "MIT"
@@ -17,6 +17,7 @@ python = "^3.7"
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.4.2"
+numpy = "^1.18.1"
 
 [tool.poetry.scripts]
 
