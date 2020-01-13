@@ -11,7 +11,7 @@ from et_stopwatch import Stopwatch
 
 def test_class_1():
     ta = []
-    stopwatch = Stopwatch(name='my timer')
+    stopwatch = Stopwatch(message='my timer')
     sleep(1)
     t = stopwatch.stop()
     print(t)

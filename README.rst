@@ -2,31 +2,69 @@
 et-stopwatch
 ============
 
-A context manager for timing code.
+A class for timing code. A :py:class:`Stopwatch` object can be used as::
 
-Typical use:
+    from et_stopwatch import Stopwatch
 
-.. code-block:: python
+    stopwatch = Stopwatch() # create and start the stopwatch
+    sleep(1)
+    stopwatch.stop()
+    print(stopwatch)
 
-    # Create a Stopwath with and end message string and printed 3 digits
-    with Stopwatch("time 5 times 'sleep(1)': ",ndigits=3) as tmr:
-        for i in range(5):
-            sleep(1) # supposing there isn't anything more useful to oo ;-)
-            print(i,tmr.timelapse()) # time since last call to timelapse()
+    stopwatch : 1.003744 s
 
-    print(tmr.time) # the total time
+Use as a context manager, with a custom message::
 
-Running this code yields:
+    with Stopwatch(message='This took') as sw:
+        for i in range(3):
+            sleep(1)
+            print(i, sw.stop(), 's') # stop() returns the time since the last call to start|stop in seconds
 
-.. code-block:: bash
+    0 1.004943
+    1 1.004948
+    2 1.003404
+    This took :
+        total  : 3.0132949999999994 s
+        minimum: 1.003404 s
+        maximum: 1.004948 s
+        mean   : 1.004432 s
+        stddev : 0.000727 s
+        count  : 3
 
-    0 1.004
-    1 1.004
-    2 1.004
-    3 1.004
-    4 1.004
-    time 5 times 'sleep(1)': 5.02 s
-    5.02
+Since :py:meth:`stop` was called more than once, some statistics are printed. Calling :py:class:`stop`
+automatically restarts the stopwatch and as a consequence the stopwatch also measures the overhead of
+the iteration over ``i``. To avoid this, explicitly call :py:meth:`start`::
+
+    with Stopwatch(message='This took') as sw:
+        for i in range(3):
+            sw.start()
+            sleep(1)
+            print(i, sw.stop(), 's') # stop() returns the time since the last call to start|stop in seconds
+
+    0 1.004388
+    1 1.004173
+    2 1.003048
+    This took :
+        total  : 3.011609 s
+        minimum: 1.003048 s
+        maximum: 1.004388 s
+        mean   : 1.00387 s
+        stddev : 0.000588 s
+        count  : 3
+
+This time, the timing are slightly shorter for each iteration.
+
+Use as decorator, with a custom message and custom number of digits printed::
+
+    @Stopwatch(name="say_hi_and_sleep_two_seconds", ndigits=3)
+    def say_hi_and_sleep_two_seconds():
+        print("hi")
+        sleep(2)
+
+    say_hi_and_sleep_two_seconds()
+
+    hi
+    say_hi_and_sleep_two_seconds : 2.003 s
 
 * Free software: MIT license
 * Documentation: https://et-stopwatch.readthedocs.io.

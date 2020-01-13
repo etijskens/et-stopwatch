@@ -26,11 +26,10 @@ venv:
 
 # Install the necessary dependendies for documenting the project.
 deps:
-	@pip show click            >/dev/null && if [ $$? -eq 0 ]; then echo "Installed: click"           ; else pip install click           ; fi
-	@pip show sphinx-click     >/dev/null && if [ $$? -eq 0 ]; then echo "Installed: sphinx-click"    ; else pip install sphinx-click    ; fi
-	@pip show sphinx           >/dev/null && if [ $$? -eq 0 ]; then echo "Installed: sphinx"          ; else pip install sphinx          ; fi
-	@pip show sphinx-rtd-theme >/dev/null && if [ $$? -eq 0 ]; then echo "Installed: sphinx-rtd-theme"; else pip install sphinx-rtd-theme; fi
-
+	@pip show click            >/dev/null && echo "Already installed: click"            || pip install click
+	@pip show sphinx-click     >/dev/null && echo "Already installed: sphinx-click"     || pip install sphinx-click
+	@pip show sphinx           >/dev/null && echo "Already installed: sphinx"           || pip install sphinx
+	@pip show sphinx-rtd-theme >/dev/null && echo "Already installed: sphinx-rtd-theme" || pip install sphinx-rtd-theme
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile deps
