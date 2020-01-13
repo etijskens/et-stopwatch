@@ -54,7 +54,6 @@ class Stopwatch:
         self.stopped = self.started
         if message:
             self.message = message
-        self._time = None
 
 
     #@property    # NEVER use the @property decorator for functions that change the state!
@@ -77,7 +76,7 @@ class Stopwatch:
 
         """
         self.stopped = timer()
-        t = round(self.stopped-self.started, self.ndigits)
+        t = self.stopped-self.started
         if stats:
             self.count += 1
             if t < self.min:
@@ -86,9 +85,9 @@ class Stopwatch:
                 self.max = t
             self.sum += t
             self.ssq += t*t
-        self._time = t
+        self._time = round(t, self.ndigits)
         self.start()
-        return t
+        return self._time
 
 
     @property
@@ -104,8 +103,8 @@ class Stopwatch:
 
         :returns: the mean and the standard deviation.
         """
-        self.mean = round(self.sum / self.count, self.ndigits)
-        self.stddev = round(sqrt( (self.ssq + self.mean * (self.count * self.mean - 2. * self.sum)) / (self.count) ), self.ndigits)
+        self.mean = self.sum / self.count
+        self.stddev = sqrt( (self.ssq + self.mean * (self.count * self.mean - 2. * self.sum)) / (self.count) )
         return self.mean, self.stddev
 
 
@@ -125,7 +124,14 @@ class Stopwatch:
                        "\n    mean   : {} s"\
                        "\n    stddev : {} s"\
                        "\n    count  : {}"
-            message = message.format(self.sum, self.min, self.max, self.mean, self.stddev, self.count)
+            message = message.format(
+                round(self.sum   , self.ndigits),
+                round(self.min   , self.ndigits),
+                round(self.max   , self.ndigits),
+                round(self.mean  , self.ndigits),
+                round(self.stddev, self.ndigits),
+                self.count,
+            )
         return message
     
 

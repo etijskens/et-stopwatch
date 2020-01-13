@@ -25,7 +25,7 @@ Use as a **context manager**::
     1 1.004948
     2 1.003404
     This took :
-        total  : 3.0132949999999994 s
+        total  : 3.013295 s
         minimum: 1.003404 s
         maximum: 1.004948 s
         mean   : 1.004432 s
