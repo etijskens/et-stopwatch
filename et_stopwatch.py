@@ -9,7 +9,8 @@ Inspiration taken from `Python Timer Functions: Three Ways to Monitor Your Code 
 __version__ = "1.0.5"
 
 from timeit import default_timer as timer
-from sys import float_info
+from sys import float_info, stdout
+from datetime import datetime
 import functools
 from math import sqrt
 
@@ -23,7 +24,7 @@ class Stopwatch:
     :param int ndigits: number of digits in returned or printed timings.
 
     """
-    def __init__(self,message='Stopwatch',ndigits=6):
+    def __init__(self, message='Stopwatch', ndigits=6, file=stdout):
         self.started = -1.0
         self.stopped = -1.0
         self.max = 0.
@@ -33,6 +34,12 @@ class Stopwatch:
         self.ssq = 0.
         self.message = message
         self.ndigits = ndigits
+        if isinstance(file, str):
+            f = open(file, mode='a')
+            self.file = f
+            print(f'Stopwatch created:   {datetime.now()}', file=self.file)
+        else:
+            self.file = file
         self.start()
 
     
@@ -44,7 +51,7 @@ class Stopwatch:
     def __exit__(self, exception_type, exception_value, tb):
         if self.count == 0:
             self.stop()
-        print(self)
+        print(self, file=self.file)
 
     
     def start(self,message=None):
@@ -147,6 +154,10 @@ class Stopwatch:
 
         return wrapper_stopwatch
 
+    def __del__(self):
+        if not self.file == stdout:
+            print(f'Stopwatch destroyed: {datetime.now()}', file=self.file)
+
 # some use cases:
 if __name__ == "__main__":
 
@@ -154,6 +165,12 @@ if __name__ == "__main__":
 
     print("# Use as class:")
     stopwatch = Stopwatch() # create and start the stopwatch
+    sleep(1)
+    stopwatch.stop()
+    print(stopwatch)
+    print(stopwatch.time)
+
+    stopwatch = Stopwatch(file='test.txt') # create and start the stopwatch
     sleep(1)
     stopwatch.stop()
     print(stopwatch)
@@ -169,6 +186,12 @@ if __name__ == "__main__":
             print(sw.time)
 
     with Stopwatch('This took') as sw:
+        for i in range(3):
+            sw.start() # restart the Stopwatch
+            sleep(1)
+            print(i, sw.stop())
+
+    with Stopwatch('This took', file='test.txt') as sw:
         for i in range(3):
             sw.start() # restart the Stopwatch
             sleep(1)
