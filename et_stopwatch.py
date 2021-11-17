@@ -13,6 +13,41 @@ from sys import float_info, stdout
 from datetime import datetime
 import functools
 from math import sqrt
+from pathlib import Path
+import pickle
+
+class Statistics:
+    def __init__(self, ndigits=3):
+        self.max = 0.
+        self.min = float_info.max
+        self.count = 0
+        self.sum = 0.
+        self.ssq = 0.
+        self.ndigits = ndigits
+
+    def __call__(self, t):
+        self.count += 1
+        if t < self.min:
+            self.min = t
+        if t > self.max:
+            self.max = t
+        self.sum += t
+        self.ssq += t * t
+
+    def __repr__(self):
+        if self.count > 1:
+            self.mean = self.sum / self.count
+            self.stddev = sqrt( (self.ssq + self.mean * (self.count * self.mean - 2. * self.sum)) / (self.count) )
+            s = f"\n    total  : {round(self.sum,    self.ndigits)} s" \
+                f"\n    minimum: {round(self.min,    self.ndigits)} s" \
+                f"\n    maximum: {round(self.max,    self.ndigits)} s" \
+                f"\n    mean   : {round(self.mean,   self.ndigits)} s" \
+                f"\n    stddev : {round(self.stddev, self.ndigits)} s" \
+                f"\n    count  : {self.count}" 
+        else:
+            s = f"{round(self.sum, self.ndigits)} s"
+
+        return s
 
 
 class Stopwatch:
@@ -25,20 +60,21 @@ class Stopwatch:
 
     """
     def __init__(self, message='Stopwatch', ndigits=6, file=stdout):
+        """
+
+        :param message:
+        :param ndigits:
+        :param file: filename or file handle
+        """
         self.started = -1.0
         self.stopped = -1.0
-        self.max = 0.
-        self.min = float_info.max
-        self.count = 0
-        self.sum = 0.
-        self.ssq = 0.
+        self.stats = Statistics(ndigits)
         self.message = message
-        self.ndigits = ndigits
         if isinstance(file, str):
-            f = open(file, mode='a')
-            self.file = f
-            print(f'Stopwatch created:   {datetime.now()}', file=self.file)
+            self.filename = file
+            self.file = open(file, mode='a')
         else:
+            self.filename = None
             self.file = file
         self.start()
 
@@ -49,9 +85,22 @@ class Stopwatch:
 
 
     def __exit__(self, exception_type, exception_value, tb):
-        if self.count == 0:
+        if self.stats.count == 0:
             self.stop()
         print(self, file=self.file)
+        if self.filename:
+            t = self.stats.sum
+            p = Path(f'{self.filename}.stats')
+            if p.is_file():
+                with p.open(mode='rb') as fp:
+                    stats = pickle.load(fp)
+            else:
+                stats = Statistics(self.stats.ndigits)
+            stats(self.stats.sum)
+            with p.open(mode='wb') as fp:
+                pickle.dump(stats,fp)
+            if stats.count > 1:
+                print('Overview:',stats, file=self.file)
 
     
     def start(self,message=None):
@@ -82,19 +131,11 @@ class Stopwatch:
                         sw.start()               # restart the stopwatch
                         sleep(1)                 # only this is timed
                         print(i, sw.stop(), 's') # stop the stopwatch and returns second since start
-
         """
         self.stopped = timer()
         t = self.stopped-self.started
-        if stats:
-            self.count += 1
-            if t < self.min:
-                self.min = t
-            if t > self.max:
-                self.max = t
-            self.sum += t
-            self.ssq += t*t
-        self._time = round(t, self.ndigits)
+        self.stats(t)
+        self._time = round(t, self.stats.ndigits)
         self.start()
         return self._time
 
@@ -108,42 +149,13 @@ class Stopwatch:
         return self._time
 
 
-    def statistics(self):
-        """Compute mean and standard deviation.
-
-        :returns: the mean and the standard deviation.
-        """
-        self.mean = self.sum / self.count
-        self.stddev = sqrt( (self.ssq + self.mean * (self.count * self.mean - 2. * self.sum)) / (self.count) )
-        return self.mean, self.stddev
-
-
     def __repr__(self):
         """
         Print the objects message and total time. If stop was called more than once also statistics are printed
         (min, max, mean, stddev, count).
         """
-        message = self.message + " : "
-        if self.count <= 1:
-            message += "{} s".format(self._time)
-        else:
-            self.statistics()
-            message += "\n    total  : {} s"\
-                       "\n    minimum: {} s"\
-                       "\n    maximum: {} s"\
-                       "\n    mean   : {} s"\
-                       "\n    stddev : {} s"\
-                       "\n    count  : {}"
-            message = message.format(
-                round(self.sum   , self.ndigits),
-                round(self.min   , self.ndigits),
-                round(self.max   , self.ndigits),
-                round(self.mean  , self.ndigits),
-                round(self.stddev, self.ndigits),
-                self.count,
-            )
-        return message
-    
+        return f"{self.message} : " + str(self.stats)
+
 
     def __call__(self, func):
         """Support using StopWatch as a decorator"""
@@ -154,9 +166,16 @@ class Stopwatch:
 
         return wrapper_stopwatch
 
-    def __del__(self):
-        if not self.file == stdout:
-            print(f'Stopwatch destroyed: {datetime.now()}', file=self.file)
+    # def __del__(self):
+    #     if not self.file == stdout:
+    #         print(f'{self.message} destroyed: {datetime.now()}', file=self.file)
+    #         self.file.close()
+    #         with open(self.filename) as f:
+    #             lines = list(f)
+    #         # for line in lines:
+
+
+
 
 # some use cases:
 if __name__ == "__main__":
@@ -191,8 +210,17 @@ if __name__ == "__main__":
             sleep(1)
             print(i, sw.stop())
 
+    for p in ['test.txt', 'test.txt.stats']:
+        Path(p).unlink()
+
     with Stopwatch('This took', file='test.txt') as sw:
         for i in range(3):
+            sw.start() # restart the Stopwatch
+            sleep(1)
+            print(i, sw.stop())
+
+    with Stopwatch('This took', file='test.txt') as sw:
+        for i in range(4):
             sw.start() # restart the Stopwatch
             sleep(1)
             print(i, sw.stop())

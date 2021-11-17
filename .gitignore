@@ -1,5 +1,6 @@
 # test output file
 test.txt
+test.txt.stats
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
