@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "et-stopwatch"
-version = "1.2.3"
+version = "1.3.0"
 description = "A class for timing code (start/stop, context manager, decorator)."
 authors = ["Engelbert Tijskens <engelbert.tijskens@uantwerpen.be>"]
 license = "MIT"
