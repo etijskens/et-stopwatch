@@ -49,6 +49,15 @@ class Statistics:
 
         return s
 
+# Caveat: sending the output to a file (or file-like object)
+# Some thoughts...
+# 1 In a single threaded setting, it is best to keep the file open, as opening
+#   and closing causes overhead.
+# 2 In a multi-threaded (or multi-process) setting, this is not possible. If one
+#   thread or process opens the file, the other cannot access it. Consequently,
+#   one must keep one file per thread or process, or write atomically (i.e. open,
+#   the file, write to it and close the file again). The latter is bad for parallel
+#   file systems (many small write operations).
 
 class Stopwatch:
     """Class for timing code.
@@ -64,7 +73,9 @@ class Stopwatch:
 
         :param message:
         :param ndigits:
-        :param file: filename or file handle
+        :param file: filename, file handle, or file-like object. If it is a filename
+            (str), the writes are managed atomically, i.e. the file is opened (with mode='a'),
+            written to and closed again.
         """
         self.started = -1.0
         self.stopped = -1.0
@@ -72,7 +83,7 @@ class Stopwatch:
         self.message = message
         if isinstance(file, str):
             self.filename = file
-            self.file = open(file, mode='a')
+            self.file = None
         else:
             self.filename = None
             self.file = file
@@ -87,8 +98,12 @@ class Stopwatch:
     def __exit__(self, exception_type, exception_value, tb):
         if self.stats.count == 0:
             self.stop()
-        print(self, file=self.file)
+
+        if not self.file:
+            self.file = open(self.filename, mode='a')
+
         if self.filename:
+            # print statistics to a separate file.
             t = self.stats.sum
             p = Path(f'{self.filename}.stats')
             if p.is_file():
