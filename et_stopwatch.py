@@ -6,7 +6,7 @@ A class for timing a piece of code.
 Inspiration taken from `Python Timer Functions: Three Ways to Monitor Your Code <https://realpython.com/python-timer/#a-python-timer-decorator>`_
 
 """
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 
 from timeit import default_timer as timer
 from sys import float_info, stdout
@@ -100,7 +100,8 @@ class Stopwatch:
             self.stop()
 
         if not self.file:
-            self.file = open(self.filename, mode='a')
+            with open(self.filename, mode='a') as f:
+                print(self, file=f)
 
         if self.filename:
             # print statistics to a separate file.
