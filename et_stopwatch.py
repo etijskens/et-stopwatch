@@ -6,7 +6,7 @@ A class for timing a piece of code.
 Inspiration taken from `Python Timer Functions: Three Ways to Monitor Your Code <https://realpython.com/python-timer/#a-python-timer-decorator>`_
 
 """
-__version__ = "1.2.2"
+__version__ = "1.2.3"
 
 from timeit import default_timer as timer
 from sys import float_info, stdout
@@ -15,6 +15,9 @@ import functools
 from math import sqrt
 from pathlib import Path
 import pickle
+
+# it is sometimes useful to overwrite print, e.g. by mpi_print.printn
+print = print
 
 class Statistics:
     def __init__(self, ndigits=3):
