@@ -6,11 +6,10 @@ A class for timing a piece of code.
 Inspiration taken from `Python Timer Functions: Three Ways to Monitor Your Code <https://realpython.com/python-timer/#a-python-timer-decorator>`_
 
 """
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 
 from timeit import default_timer as timer
 from sys import float_info, stdout
-from datetime import datetime
 import functools
 from math import sqrt
 from pathlib import Path
@@ -60,10 +59,11 @@ class Statistics:
 #   thread or process opens the file, the other cannot access it. Consequently,
 #   one must keep one file per thread or process, or write atomically (i.e. open,
 #   the file, write to it and close the file again). The latter is bad for parallel
-#   file systems (many small write operations).
+#   file systems (many small write operations). The alternative is to write a separate
+#   file per rank.
 
 class Stopwatch:
-    """Class for timing code.
+    """Class for timing code fragments.
 
     Constructor parameters:
     
@@ -71,7 +71,7 @@ class Stopwatch:
     :param int ndigits: number of digits in returned or printed timings.
 
     """
-    def __init__(self, message='Stopwatch', ndigits=6, file=stdout):
+    def __init__(self, message='Stopwatch', ndigits=6, file=stdout, stats=False):
         """
 
         :param message:
@@ -91,12 +91,15 @@ class Stopwatch:
             self.filename = None
             self.file = file
         self.start()
-
+        if stats:
+            if not self.filename:
+                raise ValueError("When computing statistics over various runs you must provide a filename "
+                                 "through the 'file=' keyword argument.")
+        self.comput_stats = stats
     
     def __enter__(self):
         self.start()
         return self
-
 
     def __exit__(self, exception_type, exception_value, tb):
         if self.stats.count == 0:
@@ -106,7 +109,7 @@ class Stopwatch:
             with open(self.filename, mode='a') as f:
                 print(self, file=f)
 
-        if self.filename:
+        if self.filename and self.stats:
             # print statistics to a separate file.
             t = self.stats.sum
             p = Path(f'{self.filename}.stats')
